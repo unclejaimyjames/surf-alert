@@ -1,0 +1,35 @@
+
+#name file mail.py
+#then excecute with
+#python mail.py
+
+
+import smtplib
+
+# Server instellingen
+MailServerAdres = "smtp.website.nl"
+MailServerPoort = "587"
+MailServerLogin = ""
+MailServerPass = ""
+
+# Mail bericht
+MailOntvanger = "info@website.nl"
+MailZender = "info@website.nl"
+MailOnderwerp = "Onderwerp"
+MailBericht = "Hallo Wereld"
+
+# Contact  maken met mailserver
+mailserver = smtplib.SMTP(MailServerAdres, MailServerPoort)
+mailserver.starttls() # TLS versleuteling nodig voor Hotmail/Gmail (werkt ook met Hostnet)
+mailserver.login(MailServerLogin, MailServerPass)
+
+# Bericht samenstellen
+bericht = 'To:' + MailOntvanger  + '\n' + 'From: ' + MailZender + '\n' + 'Subject:' + MailOnderwerp + '\n\n' + MailBericht + '\n\n'
+
+# Mail verzenden
+try:
+  mailserver.sendmail(MailZender, MailOntvanger, bericht)
+  print "OK: email verzonden"
+except SMTPException:
+  print "FOUT: kan email niet verzenden!"
+  
