@@ -263,7 +263,7 @@ def periodic_event():
         print "SWELL DATA NOT REDEFINED"
 
     #   ---------   BODY OF MESSAGE   ---------
-
+    # Hier moet de HTML body van bericht komen
 
     #   ---------   IF STATEMENTS   ---------
     if  direction06 < direction_min \
