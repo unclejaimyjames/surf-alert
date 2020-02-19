@@ -1,3 +1,11 @@
+#--------------------- TO DO --------------------
+#TODO make time between updates dynamic
+#TODO start script on specific time
+#TODO email upon boot pi ("surf.py succesfullt initiated at #time")
+#TODO change conditions to absMaxBreakingHeight
+
+#---------------------------- -------------------
+
 import sched
 import datetime, time
 import urllib2
@@ -24,11 +32,11 @@ green = 1
 count = 0
 
 # VARIABELEN: condities 1 (offshore wind)
-direction_min       = 50
-direction_max       = 240
-speed_max           = 40
-height_min          = 0.29
-period_min          = 3.9
+wind_direction_min       = 50
+wind_direction_max       = 240
+wind_speed_max           = 40
+swell_height_min          = 0.29
+swell_period_min          = 3.9
 swelldirection_min  = 70
 swelldirection_max  = 200
 
@@ -42,7 +50,7 @@ qswelldirection_min  = 90
 qswelldirection_max  = 210
 
 
-#scheduler
+# Scheduler - time defined below
 class PeriodicScheduler(object):
     def __init__(self):
         self.scheduler = sched.scheduler(time.time, time.sleep)
@@ -74,7 +82,7 @@ def periodic_event():
         for item in dat06:
             wind06 = item.get("wind")
             lt06 = item.get("localTimestamp")
-            direction06 = wind06.get('direction')
+            wind_direction06 = wind06.get('direction')
             compass06 = wind06.get('compassDirection')
             gusts06 = wind06.get('gusts')
             speed06 = wind06.get('speed')
@@ -158,7 +166,7 @@ def periodic_event():
             primary_direction06 = primary06.get('direction')
             primary_compassdirection06 = primary06.get('compassDirection')
             primary_period06 = primary06.get('period')
-            primary_height06 = primary06.get('height')
+            swell_primary_height06 = primary06.get('height')
 
         # 09:00 next day
         dats09 = dataswell[11:12]
@@ -263,18 +271,18 @@ def periodic_event():
         print "SWELL DATA NOT REDEFINED"
 
     #   ---------   BODY OF MESSAGE   ---------
-    # Hier moet de HTML body van bericht komen
+    #TODO Hier moet de HTML body van bericht komen
 
     #   ---------   IF STATEMENTS   ---------
-    if  direction06 < direction_min \
-        and speed06 < speed_max\
-        and primary_height06 > height_min\
-        and primary_period06 > period_min\
+    if  wind_direction06 < wind_direction_min \
+        and speed06 < wind_speed_max\
+        and swell_primary_height06 > swell_height_min\
+        and primary_period06 > swell_period_min\
         and swelldirection_min < primary_direction06 < swelldirection_max \
-        or direction06 > direction_max \
-        and speed06 < speed_max \
-        and primary_height06 > height_min \
-        and primary_period06 > period_min \
+        or wind_direction06 > wind_direction_max \
+        and speed06 < wind_speed_max \
+        and swell_primary_height06 > swell_height_min \
+        and primary_period06 > swell_period_min \
         and swelldirection_min < primary_direction06 < swelldirection_max:
 
         msg['Subject'] = "Offshore wind, morgen van af 06:00!"
@@ -285,7 +293,7 @@ def periodic_event():
                "Wind snelheid: %d\n" \
                "\nCheck MSW voor de forecast: https://magicseaweed.com/Scheveningen-Nord-Surf-Report/145/" \
                "\n\n- powered by Jaimy's surf alarm -" \
-               % (primary_height06, primary_period06, compass06, speed06)
+               % (swell_primary_height06, primary_period06, compass06, speed06)
 
         msg.attach(MIMEText(spec, 'plain'))
         text = msg.as_string()
@@ -298,15 +306,15 @@ def periodic_event():
             print "email sent"
         except:
             print "email error"
-    elif direction09 < direction_min \
-        and speed09 < speed_max\
-        and primary_height09 > height_min\
-        and primary_period09 > period_min\
+    elif direction09 < wind_direction_min \
+        and speed09 < wind_speed_max\
+        and primary_height09 > swell_height_min\
+        and primary_period09 > swell_period_min\
         and swelldirection_min < primary_direction09 < swelldirection_max \
-        or direction09 > direction_max \
-        and speed09 < speed_max \
-        and primary_height09 > height_min \
-        and primary_period09 > period_min \
+        or direction09 > wind_direction_max \
+        and speed09 < wind_speed_max \
+        and primary_height09 > swell_height_min \
+        and primary_period09 > swell_period_min \
         and swelldirection_min < primary_direction09 < swelldirection_max:
 
         msg['Subject'] = "Offshore wind, morgen rond 09:00!"
@@ -330,15 +338,15 @@ def periodic_event():
             print "email sent"
         except:
             print "email error"
-    elif direction12 < direction_min \
-        and speed12 < speed_max\
-        and primary_height12 > height_min\
-        and primary_period12 > period_min\
+    elif direction12 < wind_direction_min \
+        and speed12 < wind_speed_max\
+        and primary_height12 > swell_height_min\
+        and primary_period12 > swell_period_min\
         and swelldirection_min < primary_direction12 < swelldirection_max \
-        or direction12 > direction_max \
-        and speed12 < speed_max \
-        and primary_height12 > height_min \
-        and primary_period12 > period_min \
+        or direction12 > wind_direction_max \
+        and speed12 < wind_speed_max \
+        and primary_height12 > swell_height_min \
+        and primary_period12 > swell_period_min \
         and swelldirection_min < primary_direction12 < swelldirection_max:
 
         msg['Subject'] = "Offshore wind, morgen rond 12:00!"
@@ -362,15 +370,15 @@ def periodic_event():
             print "email sent"
         except:
             print "email error"
-    elif direction15 < direction_min \
-        and speed15 < speed_max\
-        and primary_height15 > height_min\
-        and primary_period15 > period_min\
+    elif direction15 < wind_direction_min \
+        and speed15 < wind_speed_max\
+        and primary_height15 > swell_height_min\
+        and primary_period15 > swell_period_min\
         and swelldirection_min < primary_direction15 < swelldirection_max \
-        or direction15 > direction_max \
-        and speed15 < speed_max \
-        and primary_height15 > height_min \
-        and primary_period15 > period_min \
+        or direction15 > wind_direction_max \
+        and speed15 < wind_speed_max \
+        and primary_height15 > swell_height_min \
+        and primary_period15 > swell_period_min \
         and swelldirection_min < primary_direction15 < swelldirection_max:
 
         msg['Subject'] = "Offshore wind, morgen om 15:00!"
@@ -394,15 +402,15 @@ def periodic_event():
             print "email sent"
         except:
             print "email error"
-    elif direction18 < direction_min \
-        and speed18 < speed_max\
-        and primary_height18 > height_min\
-        and primary_period18 > period_min\
+    elif direction18 < wind_direction_min \
+        and speed18 < wind_speed_max\
+        and primary_height18 > swell_height_min\
+        and primary_period18 > swell_period_min\
         and swelldirection_min < primary_direction18 < swelldirection_max \
-        or direction18 > direction_max \
-        and speed18 < speed_max \
-        and primary_height18 > height_min \
-        and primary_period18 > period_min \
+        or direction18 > wind_direction_max \
+        and speed18 < wind_speed_max \
+        and primary_height18 > swell_height_min \
+        and primary_period18 > swell_period_min \
         and swelldirection_min < primary_direction18 < swelldirection_max:
 
         msg['Subject'] = "Offshore wind, morgen van rond 18:00!"
@@ -426,15 +434,15 @@ def periodic_event():
             print "email sent"
         except:
             print "email error"
-    elif direction21 < direction_min \
-        and speed21 < speed_max\
-        and primary_height21 > height_min\
-        and primary_period21 > period_min\
+    elif direction21 < wind_direction_min \
+        and speed21 < wind_speed_max\
+        and primary_height21 > swell_height_min\
+        and primary_period21 > swell_period_min\
         and swelldirection_min < primary_direction21 < swelldirection_max \
-        or direction21 > direction_max \
-        and speed21 < speed_max \
-        and primary_height21 > height_min \
-        and primary_period21 > period_min \
+        or direction21 > wind_direction_max \
+        and speed21 < wind_speed_max \
+        and primary_height21 > swell_height_min \
+        and primary_period21 > swell_period_min \
         and swelldirection_min < primary_direction21 < swelldirection_max:
 
         msg['Subject'] = "Offshore wind, morgen rond 21:00!"
@@ -462,14 +470,14 @@ def periodic_event():
 
         # -----   CONDITIE 2   -----
 
-        if  direction06 < qdirection_min \
+        if  wind_direction06 < qdirection_min \
             and speed06 < qspeed_max \
-            and primary_height06 > qheight_min \
+            and swell_primary_height06 > qheight_min \
             and primary_period06 > qperiod_min \
             and qswelldirection_min < primary_direction06 < qswelldirection_max\
-            or  direction06 < qdirection_max \
+            or  wind_direction06 < qdirection_max \
             and speed06 < qspeed_max \
-            and primary_height06 > qheight_min \
+            and swell_primary_height06 > qheight_min \
             and primary_period06 > qperiod_min \
             and qswelldirection_min < primary_direction06 < qswelldirection_max:
 
@@ -481,7 +489,7 @@ def periodic_event():
                     "Wind snelheid: %d\n" \
                     "\nCheck MSW voor de forecast: https://magicseaweed.com/Scheveningen-Nord-Surf-Report/145/" \
                     "\n\n(Vogeltjes die vroeg zingen zijn voor de poes)" \
-                    % (primary_height06, primary_period06, compass06, speed06)
+                    % (swell_primary_height06, primary_period06, compass06, speed06)
 
             msg.attach(MIMEText(spec, 'plain'))
             text = msg.as_string()
@@ -664,4 +672,12 @@ INTERVAL = day  # interval period
 periodic_scheduler = PeriodicScheduler()
 periodic_scheduler.setup(INTERVAL, periodic_event)  # executes the event just once
 periodic_scheduler.run()  # it starts the scheduler
+
+
+
+
+#   --------    Definitions   --------
+# swell.absMaxBreakingHeight    -   Upper end of the likely range for breaking wave size on this beach. Absolute Value. Use this for smooth graphing
+# swell.maxBreakingHeight       -   Upper end of the likely range for breaking wave size on this beach. Intelligently rounded. Use this for text display
+
 
