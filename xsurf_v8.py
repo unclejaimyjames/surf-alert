@@ -1,7 +1,7 @@
 #--------------------- TO DO --------------------
 #TODO make time between updates dynamic
-#TODO start script on specific time
-#TODO email upon boot pi ("surf.py succesfullt initiated at #time")
+#TODO start script on specific time: https://schedule.readthedocs.io/en/stable/
+#TODO email upon boot pi ("surf.py succesfully initiated at #time")
 #TODO change conditions to absMaxBreakingHeight
 
 #---------------------------- -------------------
