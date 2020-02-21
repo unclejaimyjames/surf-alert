@@ -9,7 +9,7 @@ from email.MIMEText import MIMEText
 
 fromaddr = "surfmelding@gmail.com"
 toaddrs  = ['jaimyvanderheijden@gmail.com']
-#toaddrs  = ['jaimyvanderheijden@gmail.com', 'guidovanderheijden@gmail.com', 'emma.wagner@nibc.com']
+#toaddrs  = ['jaimyvanderheijden@gmail.com', 'guidovanderheijden@gmail.com']
 
 username = "surfmelding@gmail.com"
 password = "surfsurfsurf"
