@@ -1,6 +1,4 @@
 
-import urllib2
-import json
 import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
