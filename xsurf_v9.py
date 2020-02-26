@@ -3,9 +3,8 @@
 
 #---------------------------- -------------------
 
-import schedule
-import time #might be redundant
-import datetime, time
+import sched
+import time
 import urllib2
 import datetime
 import json
@@ -667,7 +666,7 @@ def periodic_event():
 #time schedule module. 'periodic_event' is the executable defined above.
 schedule.every().day.at("11:00").do(periodic_event)
 while True:
-    schedule.run_pending() # starts the scheduler
+    sched.run_pending() # starts the scheduler
     time.sleep(1)
 
 #   --------    Definitions   --------
