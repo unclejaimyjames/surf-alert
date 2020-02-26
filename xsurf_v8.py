@@ -1,12 +1,10 @@
 #--------------------- TO DO --------------------
-#TODO make time between updates dynamic
-#TODO start script on specific time: https://schedule.readthedocs.io/en/stable/
-#TODO email upon boot pi ("surf.py succesfully initiated at #time")
 #TODO change conditions to absMaxBreakingHeight
 
 #---------------------------- -------------------
 
-import sched
+import schedule
+import time #might be redundant
 import datetime, time
 import urllib2
 import datetime
@@ -28,15 +26,15 @@ msg['To'] = ", ".join(toaddrs)
 
 url1 = 'http://magicseaweed.com/api/149ef032c0d1dd2d26397212fa0658ad/forecast/?spot_id=145&fields=localTimestamp,wind.*'
 url = 'http://magicseaweed.com/api/149ef032c0d1dd2d26397212fa0658ad/forecast/?spot_id=145&fields=localTimestamp,swell.*'
-green = 1
+green = 1   #initiates import of wind data
 count = 0
 
 # VARIABELEN: condities 1 (offshore wind)
-wind_direction_min       = 50
-wind_direction_max       = 240
-wind_speed_max           = 40
-swell_height_min          = 0.29
-swell_period_min          = 3.9
+wind_direction_min  = 50
+wind_direction_max  = 240
+wind_speed_max      = 40
+swell_height_min    = 0.29
+swell_period_min    = 3.9
 swelldirection_min  = 70
 swelldirection_max  = 200
 
@@ -49,20 +47,20 @@ qperiod_min          = 4.9
 qswelldirection_min  = 90
 qswelldirection_max  = 210
 
-
-# Scheduler - time defined below
-class PeriodicScheduler(object):
-    def __init__(self):
-        self.scheduler = sched.scheduler(time.time, time.sleep)
-
-    def setup(self, interval, action, actionargs=()):
-        action(*actionargs)
-        self.scheduler.enter(interval, 1, self.setup,
-                             (interval, action, actionargs))
-
-    def run(self):
-        self.scheduler.run()
-
+#---------------------------- email @ script initiated -------------------
+msg['Subject'] = "Surf alert succesfully initiated"
+spec = "All systems up and running, sir!\n\n"
+msg.attach(MIMEText(spec, 'plain'))
+text = msg.as_string()
+try:
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(username, password)
+    server.sendmail(fromaddr, toaddrs, text)
+    server.quit()
+except:
+    print "email error"
+#---------------------------- end of email @ script initiation -------------------
 
 # This is the event to execute every time
 def periodic_event():
@@ -666,15 +664,11 @@ def periodic_event():
             time06 = (datetime.datetime.fromtimestamp(int(lt06)).strftime('%H:%M'))
             print "No conditions met:\t %s" %  timenow
 
-
-day = 60*60*24
-INTERVAL = day  # interval period
-periodic_scheduler = PeriodicScheduler()
-periodic_scheduler.setup(INTERVAL, periodic_event)  # executes the event just once
-periodic_scheduler.run()  # it starts the scheduler
-
-
-
+#time schedule module. 'periodic_event' is the executable defined above.
+schedule.every().day.at("11:00").do(periodic_event)
+while True:
+    schedule.run_pending() # starts the scheduler
+    time.sleep(1)
 
 #   --------    Definitions   --------
 # swell.absMaxBreakingHeight    -   Upper end of the likely range for breaking wave size on this beach. Absolute Value. Use this for smooth graphing
