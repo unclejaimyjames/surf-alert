@@ -6,7 +6,8 @@
 
 #---------------------------- -------------------
 
-import sched
+import schedule
+import time #might be redundant
 import datetime, time
 import urllib2
 import datetime
@@ -49,6 +50,8 @@ qperiod_min          = 4.9
 qswelldirection_min  = 90
 qswelldirection_max  = 210
 
+#def alert():
+#    print("I'm working...")
 
 # Scheduler - time defined below
 class PeriodicScheduler(object):
@@ -673,8 +676,12 @@ periodic_scheduler = PeriodicScheduler()
 periodic_scheduler.setup(INTERVAL, periodic_event)  # executes the event just once
 periodic_scheduler.run()  # it starts the scheduler
 
+#time schedule module. 'alert' is the executable defined above.
+#schedule.every().day.at("11:00").do(alert)
 
-
+#while True:
+#    schedule.run_pending() # starts the scheduler
+#    time.sleep(1)
 
 #   --------    Definitions   --------
 # swell.absMaxBreakingHeight    -   Upper end of the likely range for breaking wave size on this beach. Absolute Value. Use this for smooth graphing
