@@ -28,7 +28,7 @@ server.login(username, password)
 server.sendmail(fromaddr, toaddrs, text)
 server.quit()
 
-schedule.every().day.at("18:00").do(job)
+schedule.every(5).minutes.do(job)
 
 while True:
     schedule.run_pending()
