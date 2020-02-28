@@ -666,7 +666,7 @@ def periodic_event():
 #time schedule module. 'periodic_event' is the executable defined above.
 schedule.every().day.at("12:00").do(periodic_event)
 while True:
-    sched.run_pending() # starts the scheduler
+    schedule.run_pending() # starts the scheduler
     time.sleep(1)
 
 #   --------    Definitions   --------

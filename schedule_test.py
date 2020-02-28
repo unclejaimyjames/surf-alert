@@ -22,13 +22,13 @@ msg.attach(MIMEText(body, 'plain'))
 text = msg.as_string()
 
 def job():
-server = smtplib.SMTP('smtp.gmail.com', 587)
-server.starttls()
-server.login(username, password)
-server.sendmail(fromaddr, toaddrs, text)
-server.quit()
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(username, password)
+    server.sendmail(fromaddr, toaddrs, text)
+    server.quit()
 
-schedule.every(5).minutes.do(job)
+schedule.every(2).minutes.do(job)
 
 while True:
     schedule.run_pending()
