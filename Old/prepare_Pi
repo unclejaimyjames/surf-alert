@@ -3,3 +3,4 @@ sudo apt install git
 
 apt-get install python-urllib3
 
+pip install smtplib
