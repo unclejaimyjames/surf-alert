@@ -10,8 +10,3 @@ Updates pulled from Github
 List of recipients:
 jaimyvanderheijden@gmail.com
 
-------------------------------------------------
-Functionallity to be added
-- Start on Raspberry Pi boot
-- Initiate script on specified time
-- auto update
