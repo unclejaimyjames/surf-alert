@@ -3,7 +3,7 @@
 
 #---------------------------- -------------------
 
-import sched
+import schedule
 import time
 import urllib2
 import datetime
@@ -664,7 +664,7 @@ def periodic_event():
             print "No conditions met:\t %s" %  timenow
 
 #time schedule module. 'periodic_event' is the executable defined above.
-schedule.every().day.at("11:00").do(periodic_event)
+schedule.every().day.at("12:00").do(periodic_event)
 while True:
     sched.run_pending() # starts the scheduler
     time.sleep(1)
