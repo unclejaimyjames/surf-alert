@@ -1,5 +1,9 @@
 #--------------------- TO DO --------------------
-#TODO change conditions to absMaxBreakingHeight
+#TODO change conditions to swell.components[].absHeight
+#TODO witch conditions 1 and two (first swell and then offshore wind)
+#TODO refactor wind and swell variables
+#TODO HTML mail of Magicseaweed.com screenshot
+#TODO restructure into def instead of if
 
 #---------------------------- -------------------
 
@@ -23,28 +27,28 @@ msg = MIMEMultipart()
 msg['From'] = fromaddr
 msg['To'] = ", ".join(toaddrs)
 
-url1 = 'http://magicseaweed.com/api/149ef032c0d1dd2d26397212fa0658ad/forecast/?spot_id=145&fields=localTimestamp,wind.*'
-url = 'http://magicseaweed.com/api/149ef032c0d1dd2d26397212fa0658ad/forecast/?spot_id=145&fields=localTimestamp,swell.*'
+urlwnd = 'http://magicseaweed.com/api/149ef032c0d1dd2d26397212fa0658ad/forecast/?spot_id=145&fields=localTimestamp,wind.*'
+urlswll = 'http://magicseaweed.com/api/149ef032c0d1dd2d26397212fa0658ad/forecast/?spot_id=145&fields=localTimestamp,swell.*'
 green = 1   #initiates import of wind data
 count = 0
 
-# VARIABELEN: condities 1 (offshore wind)
-wind_direction_min  = 50
-wind_direction_max  = 240
-wind_speed_max      = 40
-swell_height_min    = 0.29
-swell_period_min    = 3.9
-swelldirection_min  = 70
-swelldirection_max  = 200
+# DEFINE CONDITIONS 1 (C1): offshore wind
+C1_min_wnddrctn  = 50
+C1_max_wnddrctn  = 240
+C1_max_wndspd      = 40
+C1_min_wavehght    = 0.29
+C1_min_swllprd    = 3.9
+C1_min_swlldrctn  = 70
+C1_max_swlldrctn  = 200
 
-# VARIABELEN: condities 2 (golven) windrichting maakt niet uit
-qdirection_min       = 359
-qdirection_max       = 1
-qspeed_max           = 20
-qheight_min          = 0.39
-qperiod_min          = 4.9
-qswelldirection_min  = 90
-qswelldirection_max  = 210
+# DEFINE CONDITIONS 2 (C2): waves
+C2_min_wnddrctn        = 359    # all wind directions
+C2_wnd_drctn_max        = 1      # all wind directions
+C2_wnd_speed_max        = 20
+C2_min_wavehght         = 0.39
+C2_min_swllprd          = 4.9
+C2_min_swlldrctn        = 90
+C2_max_swlldrctn        = 210
 
 #---------------------------- email @ script initiated -------------------
 msg['Subject'] = "Surf alert succesfully initiated"
@@ -68,8 +72,8 @@ def periodic_event():
     timenow = now.strftime("%Y-%m-%d %H:%M")
     print "Script initiated:\t %s" % timenow
 
-    data = json.load(urllib2.urlopen(url1))
-    dataswell = json.load(urllib2.urlopen(url))
+    data = json.load(urllib2.urlopen(urlwnd))
+    dataswell = json.load(urllib2.urlopen(urlswll))
 
     #   --------    WIND DATA   --------
     if green == 1:
@@ -134,7 +138,7 @@ def periodic_event():
         for item in dat21:
             wind21 = item.get("wind")
             lt21 = item.get("localTimestamp")
-            direction21 = wind21.get('direction')
+            wnd_direction_21 = wind21.get('direction')
             compass21 = wind21.get('compassDirection')
             gusts21 = wind21.get('gusts')
             speed21 = wind21.get('speed')
@@ -163,7 +167,7 @@ def periodic_event():
             primary_direction06 = primary06.get('direction')
             primary_compassdirection06 = primary06.get('compassDirection')
             primary_period06 = primary06.get('period')
-            swell_primary_height06 = primary06.get('height')
+            swell_primary_height06 = primary06.get('height') #get swell.components[].absHeight
 
         # 09:00 next day
         dats09 = dataswell[11:12]
@@ -267,20 +271,25 @@ def periodic_event():
     else:
         print "SWELL DATA NOT REDEFINED"
 
+
+
     #   ---------   BODY OF MESSAGE   ---------
     #TODO Hier moet de HTML body van bericht komen
 
+
+
     #   ---------   IF STATEMENTS   ---------
-    if  wind_direction06 < wind_direction_min \
-        and speed06 < wind_speed_max\
-        and swell_primary_height06 > swell_height_min\
-        and primary_period06 > swell_period_min\
-        and swelldirection_min < primary_direction06 < swelldirection_max \
-        or wind_direction06 > wind_direction_max \
-        and speed06 < wind_speed_max \
-        and swell_primary_height06 > swell_height_min \
-        and primary_period06 > swell_period_min \
-        and swelldirection_min < primary_direction06 < swelldirection_max:
+    # -----   CONDITIONS 1 (C1 variables)  -----
+    if  wind_direction06 < C1_min_wnddrctn \
+        and speed06 < C1_max_wndspd\
+        and swell_primary_height06 > C1_min_wavehght\
+        and primary_period06 > C1_min_swllprd\
+        and C1_min_swlldrctn < primary_direction06 < C1_max_swlldrctn \
+        or wind_direction06 > C1_max_wnddrctn \
+        and speed06 < C1_max_wndspd \
+        and swell_primary_height06 > C1_min_wavehght \
+        and primary_period06 > C1_min_swllprd \
+        and C1_min_swlldrctn < primary_direction06 < C1_max_swlldrctn:
 
         msg['Subject'] = "Offshore wind, morgen van af 06:00!"
         spec = "Kijk even of er golfhoogte is. De wind staat iig goed!\n\n" \
@@ -303,16 +312,16 @@ def periodic_event():
             print "email sent"
         except:
             print "email error"
-    elif direction09 < wind_direction_min \
-        and speed09 < wind_speed_max\
-        and primary_height09 > swell_height_min\
-        and primary_period09 > swell_period_min\
-        and swelldirection_min < primary_direction09 < swelldirection_max \
-        or direction09 > wind_direction_max \
-        and speed09 < wind_speed_max \
-        and primary_height09 > swell_height_min \
-        and primary_period09 > swell_period_min \
-        and swelldirection_min < primary_direction09 < swelldirection_max:
+    elif direction09 < C1_min_wnddrctn \
+        and speed09 < C1_max_wndspd\
+        and primary_height09 > C1_min_wavehght\
+        and primary_period09 > C1_min_swllprd\
+        and C1_min_swlldrctn < primary_direction09 < C1_max_swlldrctn \
+        or direction09 > C1_max_wnddrctn \
+        and speed09 < C1_max_wndspd \
+        and primary_height09 > C1_min_wavehght \
+        and primary_period09 > C1_min_swllprd \
+        and C1_min_swlldrctn < primary_direction09 < C1_max_swlldrctn:
 
         msg['Subject'] = "Offshore wind, morgen rond 09:00!"
         spec = "He zou zo maar kunnen dat er nog wat te surfen valt... De wind staat iig goed!\n\n" \
@@ -335,16 +344,16 @@ def periodic_event():
             print "email sent"
         except:
             print "email error"
-    elif direction12 < wind_direction_min \
-        and speed12 < wind_speed_max\
-        and primary_height12 > swell_height_min\
-        and primary_period12 > swell_period_min\
-        and swelldirection_min < primary_direction12 < swelldirection_max \
-        or direction12 > wind_direction_max \
-        and speed12 < wind_speed_max \
-        and primary_height12 > swell_height_min \
-        and primary_period12 > swell_period_min \
-        and swelldirection_min < primary_direction12 < swelldirection_max:
+    elif direction12 < C1_min_wnddrctn \
+        and speed12 < C1_max_wndspd\
+        and primary_height12 > C1_min_wavehght\
+        and primary_period12 > C1_min_swllprd\
+        and C1_min_swlldrctn < primary_direction12 < C1_max_swlldrctn \
+        or direction12 > C1_max_wnddrctn \
+        and speed12 < C1_max_wndspd \
+        and primary_height12 > C1_min_wavehght \
+        and primary_period12 > C1_min_swllprd \
+        and C1_min_swlldrctn < primary_direction12 < C1_max_swlldrctn:
 
         msg['Subject'] = "Offshore wind, morgen rond 12:00!"
         spec = "Wellicht het thuis werken waard...? \n\n" \
@@ -367,16 +376,16 @@ def periodic_event():
             print "email sent"
         except:
             print "email error"
-    elif direction15 < wind_direction_min \
-        and speed15 < wind_speed_max\
-        and primary_height15 > swell_height_min\
-        and primary_period15 > swell_period_min\
-        and swelldirection_min < primary_direction15 < swelldirection_max \
-        or direction15 > wind_direction_max \
-        and speed15 < wind_speed_max \
-        and primary_height15 > swell_height_min \
-        and primary_period15 > swell_period_min \
-        and swelldirection_min < primary_direction15 < swelldirection_max:
+    elif direction15 < C1_min_wnddrctn \
+        and speed15 < C1_max_wndspd\
+        and primary_height15 > C1_min_wavehght\
+        and primary_period15 > C1_min_swllprd\
+        and C1_min_swlldrctn < primary_direction15 < C1_max_swlldrctn \
+        or direction15 > C1_max_wnddrctn \
+        and speed15 < C1_max_wndspd \
+        and primary_height15 > C1_min_wavehght \
+        and primary_period15 > C1_min_swllprd \
+        and C1_min_swlldrctn < primary_direction15 < C1_max_swlldrctn:
 
         msg['Subject'] = "Offshore wind, morgen om 15:00!"
         spec = "Heb je morgen tijd voor een middag pauze? De wind staat iig goed!\n\n" \
@@ -399,16 +408,16 @@ def periodic_event():
             print "email sent"
         except:
             print "email error"
-    elif direction18 < wind_direction_min \
-        and speed18 < wind_speed_max\
-        and primary_height18 > swell_height_min\
-        and primary_period18 > swell_period_min\
-        and swelldirection_min < primary_direction18 < swelldirection_max \
-        or direction18 > wind_direction_max \
-        and speed18 < wind_speed_max \
-        and primary_height18 > swell_height_min \
-        and primary_period18 > swell_period_min \
-        and swelldirection_min < primary_direction18 < swelldirection_max:
+    elif direction18 < C1_min_wnddrctn \
+        and speed18 < C1_max_wndspd\
+        and primary_height18 > C1_min_wavehght\
+        and primary_period18 > C1_min_swllprd\
+        and C1_min_swlldrctn < primary_direction18 < C1_max_swlldrctn \
+        or direction18 > C1_max_wnddrctn \
+        and speed18 < C1_max_wndspd \
+        and primary_height18 > C1_min_wavehght \
+        and primary_period18 > C1_min_swllprd \
+        and C1_min_swlldrctn < primary_direction18 < C1_max_swlldrctn:
 
         msg['Subject'] = "Offshore wind, morgen van rond 18:00!"
         spec = "Vroeg weg van je werk want er zouden zo maar mooie golven mee kunnen komen!\n\n" \
@@ -431,16 +440,16 @@ def periodic_event():
             print "email sent"
         except:
             print "email error"
-    elif direction21 < wind_direction_min \
-        and speed21 < wind_speed_max\
-        and primary_height21 > swell_height_min\
-        and primary_period21 > swell_period_min\
-        and swelldirection_min < primary_direction21 < swelldirection_max \
-        or direction21 > wind_direction_max \
-        and speed21 < wind_speed_max \
-        and primary_height21 > swell_height_min \
-        and primary_period21 > swell_period_min \
-        and swelldirection_min < primary_direction21 < swelldirection_max:
+    elif wnd_direction_21 < C1_min_wnddrctn \
+        and speed21 < C1_max_wndspd\
+        and primary_height21 > C1_min_wavehght\
+        and primary_period21 > C1_min_swllprd\
+        and C1_min_swlldrctn < primary_direction21 < C1_max_swlldrctn \
+        or wnd_direction_21 > C1_max_wnddrctn \
+        and speed21 < C1_max_wndspd \
+        and primary_height21 > C1_min_wavehght \
+        and primary_period21 > C1_min_swllprd \
+        and C1_min_swlldrctn < primary_direction21 < C1_max_swlldrctn:
 
         msg['Subject'] = "Offshore wind, morgen rond 21:00!"
         spec = "Check het even met je surfmaatjes want de wind zou zo maar cadeautjes kunnen brengen!\n\n" \
@@ -465,18 +474,18 @@ def periodic_event():
             print "email error"
     else:
 
-        # -----   CONDITIE 2   -----
+        # -----   CONDITIONS 2 (C2 variables)  -----
 
-        if  wind_direction06 < qdirection_min \
-            and speed06 < qspeed_max \
-            and swell_primary_height06 > qheight_min \
-            and primary_period06 > qperiod_min \
-            and qswelldirection_min < primary_direction06 < qswelldirection_max\
-            or  wind_direction06 < qdirection_max \
-            and speed06 < qspeed_max \
-            and swell_primary_height06 > qheight_min \
-            and primary_period06 > qperiod_min \
-            and qswelldirection_min < primary_direction06 < qswelldirection_max:
+        if  wind_direction06 < C2_min_wnddrctn \
+            and speed06 < C2_wnd_speed_max \
+            and swell_primary_height06 > C2_min_wavehght \
+            and primary_period06 > C2_min_swllprd \
+            and C2_min_swlldrctn < primary_direction06 < C2_max_swlldrctn\
+            or  wind_direction06 < C2_wnd_drctn_max \
+            and speed06 < C2_wnd_speed_max \
+            and swell_primary_height06 > C2_min_wavehght \
+            and primary_period06 > C2_min_swllprd \
+            and C2_min_swlldrctn < primary_direction06 < C2_max_swlldrctn:
 
             msg['Subject'] = "Kans of surf, morgen om 06:00!"
             spec =  "Zet de wekker en bel je surf buddy!\n\n" \
@@ -499,16 +508,16 @@ def periodic_event():
                 print "email sent"
             except:
                 print "email error"
-        elif direction09 < qdirection_min \
-            and speed09 < qspeed_max \
-            and primary_height09 > qheight_min \
-            and primary_period09 > qperiod_min \
-            and qswelldirection_min < primary_direction09 < qswelldirection_max\
-            or  direction09 < qdirection_max \
-            and speed09 < qspeed_max \
-            and primary_height09 > qheight_min \
-            and primary_period09 > qperiod_min \
-            and qswelldirection_min < primary_direction09 < qswelldirection_max:
+        elif direction09 < C2_min_wnddrctn \
+            and speed09 < C2_wnd_speed_max \
+            and primary_height09 > C2_min_wavehght \
+            and primary_period09 > C2_min_swllprd \
+            and C2_min_swlldrctn < primary_direction09 < C2_max_swlldrctn\
+            or  direction09 < C2_wnd_drctn_max \
+            and speed09 < C2_wnd_speed_max \
+            and primary_height09 > C2_min_wavehght \
+            and primary_period09 > C2_min_swllprd \
+            and C2_min_swlldrctn < primary_direction09 < C2_max_swlldrctn:
 
             msg['Subject'] = "Chille surf, morgen om 09:00!"
             spec = "Verschuif die eerste meeting naar de middag. Surf in aantocht!\n\n" \
@@ -531,16 +540,16 @@ def periodic_event():
                 print "email sent"
             except:
                 print "email error"
-        elif direction12 < qdirection_min \
-            and speed12 < qspeed_max \
-            and primary_height12 > qheight_min \
-            and primary_period12 > qperiod_min \
-            and qswelldirection_min < primary_direction12 < qswelldirection_max\
-            or  direction12 < qdirection_max \
-            and speed12 < qspeed_max \
-            and primary_height12 > qheight_min \
-            and primary_period12 > qperiod_min \
-            and qswelldirection_min < primary_direction12 < qswelldirection_max:
+        elif direction12 < C2_min_wnddrctn \
+            and speed12 < C2_wnd_speed_max \
+            and primary_height12 > C2_min_wavehght \
+            and primary_period12 > C2_min_swllprd \
+            and C2_min_swlldrctn < primary_direction12 < C2_max_swlldrctn\
+            or  direction12 < C2_wnd_drctn_max \
+            and speed12 < C2_wnd_speed_max \
+            and primary_height12 > C2_min_wavehght \
+            and primary_period12 > C2_min_swllprd \
+            and C2_min_swlldrctn < primary_direction12 < C2_max_swlldrctn:
 
             msg['Subject'] = "Chille surf, morgen om 12:00!"
             spec = "Dit wordt een dagje thuis werken... Yeay!\n\n" \
@@ -563,16 +572,16 @@ def periodic_event():
                 print "email sent"
             except:
                 print "email error"
-        elif direction15 < qdirection_min \
-            and speed15 < qspeed_max \
-            and primary_height15 > qheight_min \
-            and primary_period15 > qperiod_min \
-            and qswelldirection_min < primary_direction15 < qswelldirection_max\
-            or  direction15 < qdirection_max \
-            and speed15 < qspeed_max \
-            and primary_height15 > qheight_min \
-            and primary_period15 > qperiod_min \
-            and qswelldirection_min < primary_direction15 < qswelldirection_max:
+        elif direction15 < C2_min_wnddrctn \
+            and speed15 < C2_wnd_speed_max \
+            and primary_height15 > C2_min_wavehght \
+            and primary_period15 > C2_min_swllprd \
+            and C2_min_swlldrctn < primary_direction15 < C2_max_swlldrctn\
+            or  direction15 < C2_wnd_drctn_max \
+            and speed15 < C2_wnd_speed_max \
+            and primary_height15 > C2_min_wavehght \
+            and primary_period15 > C2_min_swllprd \
+            and C2_min_swlldrctn < primary_direction15 < C2_max_swlldrctn:
 
             msg['Subject'] = "Chille surf, morgen om 15:00!"
             spec = "Gefeliciteerd, je hebt voldoende karma punten verzameld om te kunnen surfen!\n\n" \
@@ -595,16 +604,16 @@ def periodic_event():
                 print "email sent"
             except:
                 print "email error"
-        elif direction18 < qdirection_min \
-            and speed18 < qspeed_max \
-            and primary_height18 > qheight_min \
-            and primary_period18 > qperiod_min \
-            and qswelldirection_min < primary_direction18 < qswelldirection_max\
-            or  direction18 < qdirection_max \
-            and speed18 < qspeed_max \
-            and primary_height18 > qheight_min \
-            and primary_period18 > qperiod_min \
-            and qswelldirection_min < primary_direction18 < qswelldirection_max:
+        elif direction18 < C2_min_wnddrctn \
+            and speed18 < C2_wnd_speed_max \
+            and primary_height18 > C2_min_wavehght \
+            and primary_period18 > C2_min_swllprd \
+            and C2_min_swlldrctn < primary_direction18 < C2_max_swlldrctn\
+            or  direction18 < C2_wnd_drctn_max \
+            and speed18 < C2_wnd_speed_max \
+            and primary_height18 > C2_min_wavehght \
+            and primary_period18 > C2_min_swllprd \
+            and C2_min_swlldrctn < primary_direction18 < C2_max_swlldrctn:
 
             msg['Subject'] = "Chille surf, morgen om 18:00!"
             spec = "Diner+surf, surf & snack... Maakt me niet uit hoe je het fixt, als je die golven maar pakt!\n\n" \
@@ -627,16 +636,16 @@ def periodic_event():
                 print "email sent"
             except:
                 print "email error"
-        elif direction21 < qdirection_min \
-            and speed21 < qspeed_max \
-            and primary_height21 > qheight_min \
-            and primary_period21 > qperiod_min \
-            and qswelldirection_min < primary_direction21 < qswelldirection_max\
-            or  direction21 < qdirection_max \
-            and speed21 < qspeed_max \
-            and primary_height21 > qheight_min \
-            and primary_period21 > qperiod_min \
-            and qswelldirection_min < primary_direction21 < qswelldirection_max:
+        elif wnd_direction_21 < C2_min_wnddrctn \
+            and speed21 < C2_wnd_speed_max \
+            and primary_height21 > C2_min_wavehght \
+            and primary_period21 > C2_min_swllprd \
+            and C2_min_swlldrctn < primary_direction21 < C2_max_swlldrctn\
+            or  wnd_direction_21 < C2_wnd_drctn_max \
+            and speed21 < C2_wnd_speed_max \
+            and primary_height21 > C2_min_wavehght \
+            and primary_period21 > C2_min_swllprd \
+            and C2_min_swlldrctn < primary_direction21 < C2_max_swlldrctn:
 
             msg['Subject'] = "Chille surf, morgen om 21:00!"
             spec = "Niets beter dan de dag afsluiten met een goede sessie toch? Ja, toch?!\n\n" \
@@ -672,5 +681,6 @@ while True:
 #   --------    Definitions   --------
 # swell.absMaxBreakingHeight    -   Upper end of the likely range for breaking wave size on this beach. Absolute Value. Use this for smooth graphing
 # swell.maxBreakingHeight       -   Upper end of the likely range for breaking wave size on this beach. Intelligently rounded. Use this for text display
-
+# swell.components[].absHeight  -   Significant Wave Height. The average of the largest third of all waves in this swell. Comparable to normal readings of height from another computer forecast, wave buoy or trained human observer. Intelligently rounded for display dependent on units without rounding
+#
 
