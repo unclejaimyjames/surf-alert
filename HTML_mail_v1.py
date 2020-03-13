@@ -32,3 +32,4 @@ part1 = MIMEText(html, 'html')
 msg.attach(part1)
 
 print msg.as_string()
+

@@ -14,7 +14,7 @@ msg['From'] = fromaddr
 msg['To'] = ", ".join(toaddrs)
 msg['Subject'] = "Pi test"
 
-body = "E-mail succesfully sent\nUpdate v1.1\n"
+body = "E-mail succesfully sent\nUpdate v1.2\n"
 
 msg.attach(MIMEText(body, 'plain'))
 text = msg.as_string()

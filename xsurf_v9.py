@@ -1,11 +1,10 @@
 #--------------------- TO DO --------------------
-#TODO change conditions to swell.components[].absHeight
 #TODO witch conditions 1 and two (first swell and then offshore wind)
 #TODO refactor wind and swell variables
 #TODO HTML mail of Magicseaweed.com screenshot
 #TODO restructure into def instead of if
 
-#---------------------------- -------------------
+#-----------------------------------------------
 
 import schedule
 import time
@@ -27,8 +26,10 @@ msg = MIMEMultipart()
 msg['From'] = fromaddr
 msg['To'] = ", ".join(toaddrs)
 
-urlwnd = 'http://magicseaweed.com/api/149ef032c0d1dd2d26397212fa0658ad/forecast/?spot_id=145&fields=localTimestamp,wind.*'
-urlswll = 'http://magicseaweed.com/api/149ef032c0d1dd2d26397212fa0658ad/forecast/?spot_id=145&fields=localTimestamp,swell.*'
+urlwnd = \
+    'http://magicseaweed.com/api/149ef032c0d1dd2d26397212fa0658ad/forecast/?spot_id=145&fields=localTimestamp,wind.*'
+urlswll = \
+    'http://magicseaweed.com/api/149ef032c0d1dd2d26397212fa0658ad/forecast/?spot_id=145&fields=localTimestamp,swell.*'
 green = 1   #initiates import of wind data
 count = 0
 
@@ -674,6 +675,7 @@ def periodic_event():
 
 #time schedule module. 'periodic_event' is the executable defined above.
 schedule.every().day.at("12:00").do(periodic_event)
+
 while True:
     schedule.run_pending() # starts the scheduler
     time.sleep(1)

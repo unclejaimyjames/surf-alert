@@ -1,6 +1,12 @@
-#install git
+# install git
 sudo apt install git
 
-apt-get install python-urllib3
-
+# install secure-smtplib
 pip install smtplib
+
+# install pip install
+apt install python-pip
+
+# install schedule
+pip install schedule
+

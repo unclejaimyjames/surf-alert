@@ -29,12 +29,13 @@ combined_height06 = combined06.get('height')
 
 primary_direction06 = primary06.get('direction')
 primary_compassdirection06 = primary06.get('compassDirection')
-primary_period06 = primary06.get('period')
-primary_height06 = primary06.get('height')
+primary_period06 = primary06.get('period') #ALSO IMPORTANT
+primary_height06 = primary06.get('height') #THIS THE THING TO BASE COMPARE ON!
 
 print "\n"
 print(datetime.datetime.fromtimestamp(int(lt)).strftime('%d-%m-%Y %H:%M:%S'))
 print "\n"
+print "components06 :\t\t\t %s" %  components06
 print "combined06 :\t\t\t %s" %  combined06
 print "primary06 :\t\t\t %s" %  primary06
 
