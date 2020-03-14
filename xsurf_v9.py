@@ -1,6 +1,4 @@
 #--------------------- TO DO --------------------
-#TODO witch conditions 1 and two (first swell and then offshore wind)
-#TODO refactor wind and swell variables
 #TODO HTML mail of Magicseaweed.com screenshot
 #TODO restructure into def instead of if
 
@@ -33,19 +31,19 @@ urlswll = \
 green = 1   #initiates import of wind data
 count = 0
 
-# DEFINE CONDITIONS 1 (C1): offshore wind
-C1_min_wnddrctn  = 50
-C1_max_wnddrctn  = 240
-C1_max_wndspd      = 40
-C1_min_wavehght    = 0.29
-C1_min_swllprd    = 3.9
-C1_min_swlldrctn  = 70
-C1_max_swlldrctn  = 200
+# DEFINE CONDITIONS 1 (C1): offshore wind + swell
+C1_min_wnddrctn     = 50
+C1_max_wnddrctn     = 240
+C1_max_wndspd       = 40         # all wind speeds
+C1_min_wavehght     = 0.29
+C1_min_swllprd      = 4.9
+C1_min_swlldrctn    = 70
+C1_max_swlldrctn    = 200
 
-# DEFINE CONDITIONS 2 (C2): waves
-C2_min_wnddrctn        = 359    # all wind directions
+# DEFINE CONDITIONS 2 (C2): swell
+C2_min_wnddrctn         = 359    # all wind directions
 C2_wnd_drctn_max        = 1      # all wind directions
-C2_wnd_speed_max        = 20
+C2_wnd_speed_max        = 40     # all wind speeds
 C2_min_wavehght         = 0.39
 C2_min_swllprd          = 4.9
 C2_min_swlldrctn        = 90
@@ -63,7 +61,7 @@ try:
     server.sendmail(fromaddr, toaddrs, text)
     server.quit()
 except:
-    print "email error"
+    print "email error 101"
 #---------------------------- end of email @ script initiation -------------------
 
 # This is the event to execute every time
@@ -292,14 +290,14 @@ def periodic_event():
         and primary_period06 > C1_min_swllprd \
         and C1_min_swlldrctn < primary_direction06 < C1_max_swlldrctn:
 
-        msg['Subject'] = "Offshore wind, morgen van af 06:00!"
+        msg['Subject'] = "Offshore wind en swell, morgen van af 06:00!"
         spec = "Kijk even of er golfhoogte is. De wind staat iig goed!\n\n" \
                "Golf hoogte: %d\n" \
                "Periode: %d\n" \
                "Wind richting: %s\n" \
                "Wind snelheid: %d\n" \
                "\nCheck MSW voor de forecast: https://magicseaweed.com/Scheveningen-Nord-Surf-Report/145/" \
-               "\n\n- powered by Jaimy's surf alarm -" \
+               "\n\n- powered by Jaimy -" \
                % (swell_primary_height06, primary_period06, compass06, speed06)
 
         msg.attach(MIMEText(spec, 'plain'))
@@ -324,7 +322,7 @@ def periodic_event():
         and primary_period09 > C1_min_swllprd \
         and C1_min_swlldrctn < primary_direction09 < C1_max_swlldrctn:
 
-        msg['Subject'] = "Offshore wind, morgen rond 09:00!"
+        msg['Subject'] = "Offshore wind en swell, morgen rond 09:00!"
         spec = "He zou zo maar kunnen dat er nog wat te surfen valt... De wind staat iig goed!\n\n" \
                "Golf hoogte: %d\n" \
                "Periode: %d\n" \
@@ -356,7 +354,7 @@ def periodic_event():
         and primary_period12 > C1_min_swllprd \
         and C1_min_swlldrctn < primary_direction12 < C1_max_swlldrctn:
 
-        msg['Subject'] = "Offshore wind, morgen rond 12:00!"
+        msg['Subject'] = "Offshore wind en swell, morgen rond 12:00!"
         spec = "Wellicht het thuis werken waard...? \n\n" \
                "Golf hoogte: %d\n" \
                "Periode: %d\n" \
@@ -388,7 +386,7 @@ def periodic_event():
         and primary_period15 > C1_min_swllprd \
         and C1_min_swlldrctn < primary_direction15 < C1_max_swlldrctn:
 
-        msg['Subject'] = "Offshore wind, morgen om 15:00!"
+        msg['Subject'] = "Offshore wind en swell, morgen om 15:00!"
         spec = "Heb je morgen tijd voor een middag pauze? De wind staat iig goed!\n\n" \
                "Golf hoogte: %d\n" \
                "Periode: %d\n" \
@@ -420,7 +418,7 @@ def periodic_event():
         and primary_period18 > C1_min_swllprd \
         and C1_min_swlldrctn < primary_direction18 < C1_max_swlldrctn:
 
-        msg['Subject'] = "Offshore wind, morgen van rond 18:00!"
+        msg['Subject'] = "Offshore wind en swell, morgen van rond 18:00!"
         spec = "Vroeg weg van je werk want er zouden zo maar mooie golven mee kunnen komen!\n\n" \
                "Golf hoogte: %d\n" \
                "Periode: %d\n" \
@@ -452,7 +450,7 @@ def periodic_event():
         and primary_period21 > C1_min_swllprd \
         and C1_min_swlldrctn < primary_direction21 < C1_max_swlldrctn:
 
-        msg['Subject'] = "Offshore wind, morgen rond 21:00!"
+        msg['Subject'] = "Offshore wind en swell, morgen rond 21:00!"
         spec = "Check het even met je surfmaatjes want de wind zou zo maar cadeautjes kunnen brengen!\n\n" \
                "Golf hoogte: %d\n" \
                "Periode: %d\n" \
