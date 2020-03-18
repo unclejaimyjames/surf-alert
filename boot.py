@@ -1,3 +1,6 @@
+# INITIATE BOOT: https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/
+sudo nano /etc/rc.local
+add sudo python /home/pi/surf-alert/surf.py &
 
 
 #clone surf-alert git
@@ -10,6 +13,6 @@ git pull git://github.com/unclejaimyjames/surf-alert.git
 cd surf-alert
 
 #run code
-python test.py
+python surf.py
 
 
