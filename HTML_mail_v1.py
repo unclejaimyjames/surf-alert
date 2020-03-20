@@ -1,19 +1,18 @@
+
 import smtplib
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
 
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+fromaddr = "surfmelding@gmail.com"
+toaddrs  = ['jaimyvanderheijden@gmail.com']
 
-# me == my email address
-# you == recipient's email address
-me = "my@email.com"
-you = "your@email.com"
+username = "surfmelding@gmail.com"
+password = "surfsurfsurf"
 
-# Create message container - the correct MIME type is multipart/alternative.
-msg = MIMEMultipart('alternative')
-msg['Subject'] = "Link"
-msg['From'] = me
-msg['To'] = you
-
+msg = MIMEMultipart()
+msg['From'] = fromaddr
+msg['To'] = ", ".join(toaddrs)
+msg['Subject'] = "HTML test"
 
 html = """\
 <html>
@@ -26,7 +25,6 @@ html = """\
   </body>
 </html>
 """
-
 
 part1 = MIMEText(html, 'html')
 msg.attach(part1)
