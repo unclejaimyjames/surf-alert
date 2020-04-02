@@ -57,10 +57,14 @@ try:
     server.quit()
 except:
     print "email error 101"
+
 #---------------------------- end of email @ script initiation -------------------
 
 # This is the event to execute every time
 def periodic_event():
+    # reset variables
+    spec = ""
+
     # get current time
     now = datetime.datetime.now()
     timenow = now.strftime("%Y-%m-%d %H:%M")
@@ -318,7 +322,7 @@ def periodic_event():
         and C1_min_swlldrctn < primary_direction09 < C1_max_swlldrctn:
 
         msg['Subject'] = "Offshore wind en swell, morgen rond 09:00!"
-        spec = "He zou zo maar kunnen dat er nog wat te surfen valt... De wind staat iig goed!\n\n" \
+        spec = "Het zou zo maar kunnen dat er nog wat te surfen valt... De wind staat iig goed!\n\n" \
                "Golf hoogte: %d\n" \
                "Periode: %d\n" \
                "Wind richting: %s\n" \
