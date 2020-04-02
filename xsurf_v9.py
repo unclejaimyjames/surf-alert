@@ -1,6 +1,7 @@
 #--------------------- TO DO --------------------
 #TODO HTML mail of Magicseaweed.com screenshot
 #TODO restructure into def instead of if
+#TODO clear all variables at begin of loop
 
 #-----------------------------------------------
 
